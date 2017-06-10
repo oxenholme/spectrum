@@ -2,26 +2,6 @@
 ;** An Assembly File Listing to generate a 16K ROM for the ZX Spectrum **
 ;************************************************************************
 
-; -------------------------
-; Last updated: 13-DEC-2004
-; -------------------------
-
-; TASM cross-assembler directives. 
-; ( comment out, perhaps, for other assemblers - see Notes at end.)
-
-#define DEFB .BYTE      
-#define DEFW .WORD
-#define DEFM .TEXT
-#define ORG  .ORG
-#define EQU  .EQU
-#define equ  .EQU
-
-;   It is always a good idea to anchor, using ORGs, important sections such as 
-;   the character bitmaps so that they don't move as code is added and removed.
-
-;   Generally most approaches try to maintain main entry points as they are
-;   often used by third-party software. 
-
 ORG 0000
 
 ;*****************************************
@@ -20310,8 +20290,6 @@ L3D00:  DEFB    %00000000
         DEFB    %00111100
 
 
-#end                            ; generic cross-assembler directive 
-
 ; Acknowledgements
 ; -----------------
 ; Sean Irvine               for default list of section headings
@@ -20325,16 +20303,4 @@ L3D00:  DEFB    %00000000
 ; Alvin Albrecht            for comments.
 ; Andy Styles               for full relocatability implementation and testing.                    testing.
 ; Andrew Owen               for ZASM compatibility and format improvements.
-
-;   For other assemblers you may have to add directives like these near the 
-;   beginning - see accompanying documentation.
-;   ZASM (MacOs) cross-assembler directives. (uncomment by removing ';' )
-;   #target rom           ; declare target file format as binary.
-;   #code   0,$4000       ; declare code segment.
-;   Also see notes at Address Labels 0609 and 1CA5 if your assembler has 
-;   trouble with expressions.
-;
-;   Note. The Sinclair Interface 1 ROM written by Dr. Ian Logan and Martin 
-;   Brennan calls numerous routines in this ROM.  
-;   Non-standard entry points have a label beginning with X. 
 
