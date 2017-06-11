@@ -16594,36 +16594,7 @@ L3214:  LD      A,(HL)          ;
 
 ;; T-GR-ZERO
 L3221:  CP      $91             ;
-        JR      NZ,L323F        ; to T-SMALL
-
-        INC     HL              ;
-        INC     HL              ;
-        INC     HL              ;
-        LD      A,$80           ;
-        AND     (HL)            ;
-        DEC     HL              ;
-        OR      (HL)            ;
-        DEC     HL              ;
-        JR      NZ,L3233        ; to T-FIRST
-
-        LD      A,$80           ;
-        XOR     (HL)            ;
-
-;; T-FIRST
-L3233:  DEC     HL              ;
-        JR      NZ,L326C        ; to T-EXPNENT
-
-        LD      (HL),A          ;
-        INC     HL              ;
-        LD      (HL),$FF        ;
-        DEC     HL              ;
-        LD      A,$18           ;
-        JR      L3272           ; to NIL-BYTES
-
-; ---
-
-;; T-SMALL
-L323F:  JR      NC,L326D        ; to X-LARGE
+        JR      NC,L326D        ; to X-LARGE
 
         PUSH    DE              ;
         CPL                     ;
