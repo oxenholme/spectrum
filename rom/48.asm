@@ -12209,7 +12209,7 @@ L255D:  INC     D               ; increment screen address.
         RST     30H             ; BC-SPACES creates the space sliding
                                 ; the calculator stack upwards.
         LD      (DE),A          ; start is addressed by DE, so insert code
-        JR      L257D           ; forward to S-SCR-STO
+        RET                     ; back to S-SCREEN$ and on to S-STRING.
 
 ; ---
 
@@ -12224,17 +12224,7 @@ L2573:  POP     HL              ; restore the last bitmap start
         DJNZ    L254F           ; back to S-SCRN-LP if more characters.
 
         LD      C,B             ; B is now zero, so BC now zero.
-
-;; S-SCR-STO
-L257D:  JP      L2AB2           ; to STK-STO-$ to store the string in
-                                ; workspace or a string with zero length.
-                                ; (value of DE doesn't matter in last case)
-
-; Note. this exit seems correct but the general-purpose routine S-STRING
-; that calls this one will also stack any of its string results so this
-; leads to a double storing of the result in this case.
-; The instruction at L257D should just be a RET.
-; credit Stephen Kelly and others, 1982.
+        RET                     ; back to S-SCREEN$ and on to S-STRING.
 
 ; -------------
 ; Scanning ATTR
