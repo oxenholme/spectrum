@@ -3159,9 +3159,7 @@ L0A23:  INC     C               ; move left one column.
 
         INC     B               ; move up one screen line
         LD      C,$02           ; the rightmost column position.
-        LD      A,$18           ; Note. This should be $19
-                                ; credit. Dr. Frank O'Hara, 1982
-
+        LD      A,$19           ; top of screen.
         CP      B               ; has position moved past top of screen ?
         JR      NZ,L0A3A        ; to PO-BACK-3 if not and store new position.
 
