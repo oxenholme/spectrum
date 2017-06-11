@@ -14823,9 +14823,9 @@ L2CDA:  RST     18H             ; GET-CHAR
         RST     28H             ;; FP-CALC   ;x or 0,d.           first pass.
         DEFB    $E0             ;;get-mem-0  ;x or 0,d,1.
         DEFB    $A4             ;;stk-ten    ;x or 0,d,1,10.
-        DEFB    $05             ;;division   ;x or 0,d,1/10.
-        DEFB    $C0             ;;st-mem-0   ;x or 0,d,1/10.
-        DEFB    $04             ;;multiply   ;x or 0,d/10.
+        DEFB    $04             ;;multiply   ;x or 0,d,10.
+        DEFB    $C0             ;;st-mem-0   ;x or 0,d,10.
+        DEFB    $05             ;;division   ;x or 0,d/10.
         DEFB    $0F             ;;addition   ;x or 0 + d/10.
         DEFB    $38             ;;end-calc   last value.
 
