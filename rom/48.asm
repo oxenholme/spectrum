@@ -15388,17 +15388,11 @@ L2E1E:  PUSH    DE              ; save the part before decimal point.
 ; ---------------------
 
 ; the branch was here when 'int x' was found to be zero as in say 0.5.
-; The zero has been fetched from the calculator stack but not deleted and
-; this should occur now. This omission leaves the stack unbalanced and while
-; that causes no problems with a simple PRINT statement, it will if str$ is
-; being used in an expression e.g. "2" + STR$ 0.5 gives the result "0.5"
-; instead of the expected result "20.5".
-; credit Tony Stratton, 1982.
-; A DEFB 02 delete is required immediately on using the calculator.
 
 ;; PF-SMALL
 L2E24:  RST     28H             ;; FP-CALC       int x = 0.
-L2E25:  DEFB    $E2             ;;get-mem-2      int x = 0, x-int x.
+        DEFB    $02             ;;delete         .
+        DEFB    $E2             ;;get-mem-2      x-int x.
         DEFB    $38             ;;end-calc
 
         LD      A,(HL)          ; fetch exponent of positive fractional number
@@ -15437,14 +15431,9 @@ L2E25:  DEFB    $E2             ;;get-mem-2      int x = 0, x-int x.
         LD      (HL),A          ; and store updated value
         POP     HL              ; restore HL
 
-        JP      L2ECF           ; JUMP forward to PF-FRACTN
+        JR      L2ECF           ; JUMP forward to PF-FRACTN
 
 ; ---
-
-; Note. while it would be pedantic to comment on every occasion a JP
-; instruction could be replaced with a JR instruction, this applies to the
-; above, which is useful if you wish to correct the unbalanced stack error
-; by inserting a 'DEFB 02 delete' at L2E25, and maintain main addresses.
 
 ; the branch was here with a large positive integer > 65535 e.g. 123456789
 ; the accumulator holds the exponent.
