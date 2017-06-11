@@ -16549,7 +16549,7 @@ L31FA:  INC     B               ;
         JP      M,L31D2         ; to DIV-LOOP
 
         PUSH    AF              ;
-        JR      Z,L31E2         ; to DIV-START
+        JR      Z,L31DB         ; to DIV-34TH
 
 ;
 ;
