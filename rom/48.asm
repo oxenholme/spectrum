@@ -3177,12 +3177,6 @@ L0A3A:  JP      L0DD9           ; to CL-SET and PO-STORE to save new
 ; --------------------------
 ;   This moves the print position to the right leaving a trail in the
 ;   current background colour.
-;   "However the programmer has failed to store the new print position
-;   so CHR$ 9 will only work if the next print position is at a newly
-;   defined place.
-;   e.g. PRINT PAPER 2; CHR$ 9; AT 4,0;
-;   does work but is not very helpful"
-;   - Dr. Ian Logan, Understanding Your Spectrum, 1982.
 
 ;; PO-RIGHT
 L0A3D:  LD      A,(P_FLAG)      ; fetch P_FLAG value
@@ -3191,8 +3185,7 @@ L0A3D:  LD      A,(P_FLAG)      ; fetch P_FLAG value
         LD      (IY+P_FLAG-ERR_NR),$01
                                 ; temporarily set P_FLAG 'OVER 1'.
         LD      A,$20           ; prepare a space.
-        CALL    L0B65           ; routine PO-CHAR to print it.
-                                ; Note. could be PO-ABLE which would update
+        CALL    L0AD9           ; routine PO-ABLE to print it and update
                                 ; the column position.
 
         POP     AF              ; restore the permanent flag.
