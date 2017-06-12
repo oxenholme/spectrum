@@ -12055,16 +12055,21 @@ L24FB:  RST     18H             ; GET-CHAR
                                 ; of the expression.
 
 ;; S-LOOP-1
-L24FF:  LD      C,A             ; store the character while a look up is done.
+L24FF:  CALL    L2D1B           ; routine NUMERIC will reset carry if so.
+        JP      NC,L268D        ; forward to S-DECIMAL if so.
+
+        CALL    L2C8D           ; routine ALPHA will set carry if so.
+        JP      C,L26C9         ; forward to S-LETTER if so.
+
+        LD      C,A             ; store the character while a look up is done.
         LD      HL,L2596        ; Address: scan-func
         CALL    L16DC           ; routine INDEXER is called to see if it is
                                 ; part of a limited range '+', '(', 'ATTR' etc.
 
         LD      A,C             ; fetch the character back
-        JP      NC,L2684        ; jump forward to S-ALPHNUM if not in primary
-                                ; operators and functions to consider in the
-                                ; first instance a digit or a variable and
-                                ; then anything else.                >>>
+        JP      NC,L26DF        ; jump forward to S-NEGATE if not in primary
+                                ; operators and functions to consider a '-'
+                                ; character then anything else.
 
         LD      B,$00           ; but here if it was found in table so
         LD      C,(HL)          ; fetch offset from table and make B zero.
@@ -12587,20 +12592,7 @@ L267B:  CALL    L2522           ; routine S-2-COORD
         RST     20H             ; NEXT-CHAR
         JR      L26C3           ; forward to S-NUMERIC
 
-; -----------------------------
-
-; ==> The branch was here if not in table.
-
-;; S-ALPHNUM
-L2684:  CALL    L2C88           ; routine ALPHANUM checks if variable or
-                                ; a digit.
-        JR      NC,L26DF        ; forward to S-NEGATE if not to consider
-                                ; a '-' character then functions.
-
-        CP      $41             ; compare 'A'
-        JR      NC,L26C9        ; forward to S-LETTER if alpha       ->
-                                ; else must have been numeric so continue
-                                ; into that routine.
+; ---
 
 ; This important routine is called during runtime and from LINE-SCAN
 ; when a BASIC line is checked for syntax. It is this routine that
