@@ -5542,7 +5542,7 @@ L11B7:  DI                      ; Disable Interrupts - machine stack will be
 ;; START-NEW
 L11CB:  LD      B,A             ; Save the flag to control later branching.
 
-        LD      A,$07           ; Select a white border
+        LD      A,$00           ; Select a black border
         OUT     ($FE),A         ; and set it now by writing to a port.
 
         LD      A,$3F           ; Load the accumulator with last page in ROM.
@@ -5696,8 +5696,8 @@ L121C:
         LD      (STKBOT),HL     ; set STKBOT - bottom of the empty stack.
         LD      (STKEND),HL     ; set STKEND to the end of the empty stack.
                                 ; --
-        LD      A,$38           ; the colour system is set to white paper,
-                                ; black ink, no flash or bright.
+        LD      A,$04           ; the colour system is set to black paper,
+                                ; green ink, no flash or bright.
         LD      (ATTR_P),A      ; set ATTR_P permanent colour attributes.
         LD      (ATTR_T),A      ; set ATTR_T temporary colour attributes.
         LD      (BORDCR),A      ; set BORDCR the border colour/lower screen
