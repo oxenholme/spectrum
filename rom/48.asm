@@ -2807,7 +2807,8 @@ L08DF:  DEC     DE              ; point to start of
 
         PUSH    HL              ; else save workspace pointer. 
         EX      DE,HL           ; transfer prog pointer to HL
-        CALL    L19B8           ; routine NEXT-ONE finds next line in DE.
+        CALL    L19B8           ; routine NEXT-ONE finds next line in HL.
+        EX      DE,HL           ; transfer to DE
         POP     HL              ; restore workspace pointer
         JR      L08D7           ; back to ME-OLD-LP until destination position 
                                 ; in program area found.
@@ -2845,9 +2846,8 @@ L08F9:  LD      A,(HL)          ; fetch first byte.
 ;; ME-OLD-V1
 L0901:  PUSH    BC              ; save character in C.
         CALL    L19B8           ; routine NEXT-ONE gets following variable 
-                                ; address in DE.
+                                ; address in HL.
         POP     BC              ; restore character in C
-        EX      DE,HL           ; transfer next address to HL.
         JR      L08F9           ; loop back to ME-OLD-VP
 
 ; --- 
@@ -2921,7 +2921,7 @@ L092C:  JR      NZ,L093E        ; forward to ME-ENT-1 for insertion only.
         EX      DE,HL           ; transfer program dest pointer to HL.
         CALL    L19B8           ; routine NEXT-ONE finds following location
                                 ; in program or variables area.
-        CALL    L19E8           ; routine RECLAIM-2 reclaims the space between.
+        CALL    L19E5           ; routine RECLAIM-1 reclaims the space between.
         EX      DE,HL           ; transfer program dest pointer back to DE.
         LD      HL,(X_PTR)      ; fetch adjusted workspace pointer from X_PTR
         EX      AF,AF'          ; restore flags.
@@ -2932,8 +2932,8 @@ L092C:  JR      NZ,L093E        ; forward to ME-ENT-1 for insertion only.
 L093E:  EX      AF,AF'          ; save or re-save flags.
         PUSH    DE              ; save dest pointer in prog/vars area.
         CALL    L19B8           ; routine NEXT-ONE finds next in workspace.
-                                ; gets next in DE, difference in BC.
-                                ; prev addr in HL
+        CALL    L19DD           ; routine DIFFER gets next in DE, 
+                                ; difference in BC, prev addr in HL.
         LD      (X_PTR),HL      ; store pointer in X_PTR
         LD      HL,(PROG)       ; load HL from system variable PROG
         EX      (SP),HL         ; swap with prog/vars pointer on stack. 
@@ -6090,7 +6090,7 @@ L155D:  LD      (E_PPC),BC      ; set E_PPC to extracted line number.
         JR      NZ,L157D        ; forward if no existing line to MAIN-ADD1.
 
         CALL    L19B8           ; routine NEXT-ONE finds the existing line.
-        CALL    L19E8           ; routine RECLAIM-2 reclaims it.
+        CALL    L19E5           ; routine RECLAIM-1 reclaims it.
 
 ;; MAIN-ADD1
 L157D:  POP     BC              ; retrieve the length of the new line.
@@ -7050,6 +7050,7 @@ L1795:  LD      (LISTSP),SP     ; save stack pointer in LIST_SP
 L17CE:  PUSH    BC              ; save the result.
         CALL    L19B8           ; routine NEXT-ONE gets address in HL of
                                 ; line after auto-line (in DE).
+        EX      DE,HL           ; address of next line to HL.
         POP     BC              ; restore result.
         ADD     HL,BC           ; compute back.
         JR      C,L17E4         ; to AUTO-L-3 if line 'should' appear
@@ -7593,8 +7594,7 @@ L1974:  POP     BC              ; restore the line number to BC
 
         PUSH    BC              ; save the current line number
         CALL    L19B8           ; routine NEXT-ONE finds address of next
-                                ; line number in DE, previous in HL.
-        EX      DE,HL           ; switch so next in HL
+                                ; line number in HL, previous in DE.
         JR      L1974           ; back to LINE-AD-1 for another comparison
 
 ; --------------------
@@ -7776,6 +7776,7 @@ L19D6:  INC     HL              ; increment to address the length low byte.
 L19DB:  ADD     HL,BC           ; add the length to give address of next
                                 ; line/variable in HL.
         POP     DE              ; restore previous address to DE.
+        RET
 
 ; ------------------
 ; Difference routine
@@ -13463,8 +13464,7 @@ L2929:  POP     HL              ; pop saved pointer to char 1
 
 ;; V-NEXT
 L292A:  PUSH    BC              ; save flags
-        CALL    L19B8           ; routine NEXT-ONE gets next variable in DE
-        EX      DE,HL           ; transfer to HL.
+        CALL    L19B8           ; routine NEXT-ONE gets next variable in HL
         POP     BC              ; restore the flags
         JR      L2900           ; loop back to V-EACH
                                 ; to compare each variable
@@ -14537,7 +14537,7 @@ L2C15:  JR      C,L2C1F         ; skip to D-LETTER if variable did not exist.
         PUSH    BC              ; save type in C.
         CALL    L19B8           ; routine NEXT-ONE find following variable
                                 ; or position of $80 end-marker.
-        CALL    L19E8           ; routine RECLAIM-2 reclaims the 
+        CALL    L19E5           ; routine RECLAIM-1 reclaims the 
                                 ; space between.
         POP     BC              ; pop the type.
 
