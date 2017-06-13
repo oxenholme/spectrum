@@ -9065,7 +9065,7 @@ L1D34:  PUSH    HL              ; save position.
 
         POP     HL              ; restore variable position
         EX      DE,HL           ; swap pointers
-        LD      C,$0A           ; ten bytes to move
+        LD      BC,$0A          ; ten bytes to move
         LDIR                    ; Copy 'deleted' values to variable.
         LD      HL,(PPC)        ; Load with current line number from PPC
         EX      DE,HL           ; exchange pointers.
@@ -12863,7 +12863,7 @@ L274C:  PUSH    DE              ; now stack this priority/operation
         LD      A,E             ; fetch the operation code
         AND     $3F             ; mask off the result/operand bits to leave
                                 ; a calculator literal.
-        LD      B,A             ; transfer to B register
+        LD      (BREG),A        ; transfer to BREG
 
 ; now use the calculator to perform the single operation - operand is on
 ; the calculator stack.
@@ -16949,16 +16949,7 @@ L335B:  CALL    L35BF           ; routine STK-PNTRS is called to set up the
 
 ; the calculate routine is called at this point by the series generator...
 
-;; GEN-ENT-1
-L335E:  LD      A,B             ; fetch the Z80 B register to A
-        LD      (BREG),A        ; and store value in system variable BREG.
-                                ; this will be the counter for dec-jr-nz
-                                ; or if used from fp-calc2 the calculator
-                                ; instruction.
-
-; ... and again later at this point
-
-;; GEN-ENT-2
+;; GEN-ENT
 L3362:  EXX                     ; switch sets
         EX      (SP),HL         ; and store the address of next instruction,
                                 ; the return address, in H'L'.
@@ -17038,11 +17029,6 @@ L338E:  LD      DE,L32D7        ; Address: tbl-addrs
         PUSH    DE              ; now address of routine
         EXX                     ; main set
                                 ; avoid using IY register.
-        LD      BC,(STKEND+1)   ; STKEND_hi
-                                ; nothing much goes to C but BREG to B
-                                ; and continue into next ret instruction
-                                ; which has a dual identity
-
 
 ; ------------------
 ; Handle delete (02)
@@ -17374,16 +17360,11 @@ L343E:  LD      A,(DE)          ; each byte of second
 ;   and Dr Frank O'Hara, published 1983 by Melbourne House.
 
 ;; series-xx
-L3449:  LD      B,A             ; parameter $00 - $1F to B counter
-        CALL    L335E           ; routine GEN-ENT-1 is called.
-                                ; A recursive call to a special entry point
-                                ; in the calculator that puts the B register
-                                ; in the system variable BREG. The return
-                                ; address is the next location and where
-                                ; the calculator will expect its first
-                                ; instruction - now pointed to by HL'.
-                                ; The previous pointer to the series of
-                                ; five-byte numbers goes on the machine stack.
+L3449:  LD      (BREG),A        ; parameter $00 - $1F to BREG
+        CALL    L3362           ; routine GEN-ENT recursively re-enters
+                                ; the calculator 
+                                ; H'L' value goes on the machine stack and is
+                                ; then loaded as usual with the next address.
 
 ; The initialization phase.
 
@@ -17411,9 +17392,8 @@ L3453:  DEFB    $31             ;;duplicate       v,v.
 
         CALL    L33C6           ; routine STK-DATA is called directly to
                                 ; push a value and advance H'L'.
-        CALL    L3362           ; routine GEN-ENT-2 recursively re-enters
-                                ; the calculator without disturbing
-                                ; system variable BREG
+        CALL    L3362           ; routine GEN-ENT recursively re-enters
+                                ; the calculator 
                                 ; H'L' value goes on the machine stack and is
                                 ; then loaded as usual with the next address.
 
@@ -17904,7 +17884,7 @@ L352D:  EX      DE,HL           ; make HL point to the number.
 ;   for numbers and strings.
 
 ;; no-l-eql,etc.
-L353B:  LD      A,B             ; transfer literal to accumulator.
+L353B:  LD      A,(BREG)        ; transfer literal to accumulator.
         SUB     $08             ; subtract eight - which is not useful. 
 
         BIT     2,A             ; isolate '>', '<', '='.
