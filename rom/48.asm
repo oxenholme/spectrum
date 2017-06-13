@@ -12865,18 +12865,30 @@ L274C:  PUSH    DE              ; now stack this priority/operation
                                 ; a calculator literal.
         LD      (BREG),A        ; transfer to BREG
 
-; now use the calculator to perform the single operation - operand is on
-; the calculator stack.
-; Note. although the calculator is performing a single operation most
-; functions e.g. TAN are written using other functions and literals and
-; these in turn are written using further strings of calculator literals so
-; another level of magical recursion joins the juggling act for a while
-; as the calculator too is calling itself.
+        LD      HL,L2759        ; Return address from routine
+        PUSH    HL              ; Push onto stack
 
-        RST     28H             ;; FP-CALC
-        DEFB    $3B             ;;fp-calc-2
-L2758:  DEFB    $38             ;;end-calc
+        LD      DE,L32D7        ; Address: tbl-addrs
+        RLCA
+        LD      L,A
+        RRCA
+        LD      H,$00
+        ADD     HL,DE           ; Get address of routine address
+        LD      E,(HL)
+        INC     HL
+        LD      D,(HL)
+        PUSH    DE              ; Push routine address onto stack
 
+        CALL    L35BF           ; routine STK-PNTRS
+        CP      $18             ; compare with first unary operations.
+        RET     NC              ; indirectly call routine if unary
+
+        LD      DE,-5           ; DE = HL, HL = DE - 5
+        EX      DE,HL
+        ADD     HL,DE
+        RET                     ; indirectly call routine
+
+L2759:  LD      (STKEND),DE
         JR      L2764           ; forward to S-RUNTEST
 
 ; ---
@@ -17055,7 +17067,6 @@ L33A2:  POP     AF              ; drop return address.
                                 ; value will be literal e.g. 'tan'
         EXX                     ; switch to alt
         JR      L336C           ; back to SCAN-ENT
-                                ; next literal will be end-calc at L2758
 
 ; ---------------------------------
 ; THE 'TEST FIVE SPACES' SUBROUTINE
