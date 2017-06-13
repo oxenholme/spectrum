@@ -18477,22 +18477,14 @@ L36A0:  RST     28H             ;; FP-CALC          17, 3.
 ; It is best to work through using, say, +-3.4 as examples.
 
 ;; int
-L36AF:  RST     28H             ;; FP-CALC              x.    (= 3.4 or -3.4).
-        DEFB    $31             ;;duplicate             x, x.
-        DEFB    $36             ;;less-0                x, (1/0)
-        DEFB    $00             ;;jump-true             x, (1/0)
-        DEFB    $04             ;;to L36B7, X-NEG
+L36AF:  INC     HL
+        LD      A,(HL)
+        DEC     HL
+        BIT     7,A
+        JP      Z,L3214         ;; truncate
 
-        DEFB    $3A             ;;truncate              trunc 3.4 = 3.
-        DEFB    $38             ;;end-calc              3.
-
-        RET                     ; return with + int x on stack.
-
-; ---
-
-
-;; X-NEG
-L36B7:  DEFB    $31             ;;duplicate             -3.4, -3.4.
+        RST     28H             ;; FP-CALC              x.    (= -3.4).
+        DEFB    $31             ;;duplicate             -3.4, -3.4.
         DEFB    $3A             ;;truncate              -3.4, -3.
         DEFB    $C0             ;;st-mem-0              -3.4, -3.
         DEFB    $03             ;;subtract              -.4
