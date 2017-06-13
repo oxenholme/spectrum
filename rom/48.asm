@@ -8984,11 +8984,8 @@ L1CF0:  POP     BC              ; drop return address - STMT-RET
                                 ; to check syntax of PRINT "You Win"
 
 
-        RST     28H             ;; FP-CALC    score>100 (1=TRUE 0=FALSE)
-        DEFB    $02             ;;delete      .
-        DEFB    $38             ;;end-calc
-
-        EX      DE,HL           ; make HL point to deleted value
+        CALL    L35BF           ; HL - address of top value on stack
+        LD      (STKEND),HL     ; trim stack
         CALL    L34E9           ; routine TEST-ZERO
         JP      C,L1BB3         ; jump to LINE-END if FALSE (0)
 
@@ -14318,9 +14315,9 @@ L2B59:  PUSH    HL              ; save the pointer.
 
 ; the value of variable is deleted but remains after calculator stack.
 
-        RST     28H             ;; FP-CALC
-        DEFB    $02             ;;delete      ; delete variable value
-        DEFB    $38             ;;end-calc
+        CALL    L35BF           ; HL - address of top value on stack
+        LD      (STKEND),HL     ; trim stack
+        EX      DE,HL
 
 ; DE (STKEND) points to start of value.
 
@@ -15158,9 +15155,7 @@ L2D8E:  PUSH    HL              ; preserve HL
 ; stack to the BC register.
 
 ;; FP-TO-BC
-L2DA2:  RST     28H             ;; FP-CALC            set HL to
-        DEFB    $38             ;;end-calc            point to last value.
-
+L2DA2:  CALL    L35BF           ; routine STK-PNTRS
         LD      A,(HL)          ; get first of 5 bytes
         AND     A               ; and test
         JR      Z,L2DAD         ; forward to FP-DELETE if an integer
@@ -15176,10 +15171,12 @@ L2DA2:  RST     28H             ;; FP-CALC            set HL to
 ; now delete but leave HL pointing at integer
 
 ;; FP-DELETE
-L2DAD:  RST     28H             ;; FP-CALC
-        DEFB    $02             ;;delete
-        DEFB    $38             ;;end-calc
-
+L2DAD:  LD      HL,(STKEND)
+        LD      DE,-5
+        ADD     HL,DE
+        LD      (STKEND),HL
+        EX      DE,HL
+        ADD     HL,DE           ; equiv to calc, delete, end-calc
         PUSH    HL              ; save pointer.
         PUSH    DE              ; and STKEND.
         EX      DE,HL           ; make HL point to exponent/zero indicator
@@ -18114,13 +18111,9 @@ L35B7:  POP     BC              ; now second length
 ;   the CALCULATE routine.
 
 ;; STK-PNTRS
-L35BF:  LD      HL,(STKEND)     ; fetch STKEND value from system variable.
-        LD      DE,$FFFB        ; the value -5
-        PUSH    HL              ; push STKEND value.
-
+L35BF:  LD      DE,(STKEND)     ; fetch STKEND value from system variable.
+        LD      HL,$FFFB        ; the value -5
         ADD     HL,DE           ; subtract 5 from HL.
-
-        POP     DE              ; pop STKEND to DE.
         RET                     ; return.
 
 ; -------------------
