@@ -7580,21 +7580,27 @@ L196C:  RST     10H             ; PRINT-A vectors the character to
 ; and the address of the previous line in DE.
 
 ;; LINE-ADDR
-L196E:  PUSH    HL              ; save line number in HL register
+L196E:  LD      B,H
+        LD      C,L
         LD      HL,(PROG)       ; fetch start of program from PROG
         LD      D,H             ; transfer address to
         LD      E,L             ; the DE register pair.
 
 ;; LINE-AD-1
-L1974:  POP     BC              ; restore the line number to BC
-        CALL    L1980           ; routine CP-LINES compares with that
+L1974:  CALL    L1980           ; routine CP-LINES compares with that
                                 ; addressed by HL
         RET     NC              ; return if line has been passed or matched.
                                 ; if NZ, address of previous is in DE
 
-        PUSH    BC              ; save the current line number
-        CALL    L19B8           ; routine NEXT-ONE finds address of next
-                                ; line number in HL, previous in DE.
+        PUSH    HL
+        INC     HL
+        INC     HL
+        LD      E,(HL)
+        INC     HL
+        LD      D,(HL)
+        INC     HL
+        ADD     HL,DE
+        POP     DE
         JR      L1974           ; back to LINE-AD-1 for another comparison
 
 ; --------------------
